@@ -1,0 +1,82 @@
+<suite descriptor="{{ suite.descriptor }}" version="{{ suite.version }}">
+    {% for xform in suite.xforms %}
+        <xform>
+            <resource descriptor="{{ xform.id }}" version="{{ suite.version }}"
+                      id="{{ xform.id }}">
+                <location authority="local">{{ xform.relative_url }}</location>
+                <location authority="remote">{{ xform.relative_url }}</location>
+            </resource>
+        </xform>
+    {% endfor %}
+    {% for locale, locale_name in suite.locales %}
+        <locale language="{{ locale }}">
+            <resource descriptor="Translation: {{ locale_name }}" version="{{ suite.version }}"
+                      id="app_{{ locale }}_strings">
+                <location authority="local">./{{ locale }}/app_strings.txt</location>
+                <location authority="remote">./{{ locale }}/app_strings.txt</location>
+            </resource>
+        </locale>
+    {% endfor %}
+    {% for detail in suite.details %}
+        <detail id="{{ detail.id }}">
+            <title>
+                <text>
+                    <locale id="{{ detail.locale_title_text }}"/>
+                </text>
+            </title>
+            {% for field in detail.fields %}
+                <field>
+                    <header>
+                        <text>
+                            <locale id="{{ field.locale_header_text }}"/>
+                        </text>
+                    </header>
+                    <template>
+                        <text>
+                            <xpath function="{{ field.name }}"/>
+                        </text>
+                    </template>
+                    <sort>
+                        <text>
+                            <xpath function="{{ field.name }}"/>
+                        </text>
+                    </sort>
+                </field>
+            {% endfor %}
+        </detail>
+    {% endfor %}
+    {% for entry in suite.entries %}
+        <entry>
+            {% if entry.namespace %}
+                <form>http://openrosa.org/formdesigner/{{ entry.namespace }}</form>
+            {% endif %}
+            <command id="{{ entry.id }}">
+                <text>
+                    <locale id="{{ entry.locale_text }}"/>
+                </text>
+            </command>
+            {% for instance in entry.instances %}
+                <instance src="{{ instance.src }}" id="{{ instance.id }}"/>
+            {% endfor %}
+            {% if entry.session_data %}
+                <session>
+                    {% for data in entry.session_data %}
+                        <datum detail-select="{{ data.select }}" detail-confirm="{{ data.confirm }}"
+                               nodeset="{{ data.nodeset|safe }}"
+                               id="{{ data.id }}" value="{{ data.value }}"/>
+                    {% endfor %}
+                </session>
+            {% endif %}
+        </entry>
+    {% endfor %}
+    {% for menu in suite.menus %}
+        <menu id="{{ menu.id }}">
+            <text>
+                <locale id="{{ menu.locale_text }}"/>
+            </text>
+            {% for item in menu.items %}
+                <command id="{{ item.id }}"/>
+            {% endfor %}
+        </menu>
+    {% endfor %}
+</suite>
